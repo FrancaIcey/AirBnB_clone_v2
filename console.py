@@ -121,15 +121,21 @@ class HBNBCommand(cmd.Cmd):
         # Spliting the args
         args = args.split()
 
-        # Check if the class exists
+        # Checks if the specified class exists;
+        # if not, it displays an error message.
         class_name = args[0]
         if class_name not in HBNBCommand.classes:
             print("** class doesn't exist **")
             return
 
+        # Extracts keyword arguments from the arguments
+        # in the format "key=value" and evaluates the values
         kwargs = {}
         for arg in args[1:]:
             key, value = tuple(arg.split("="))
+
+        # If a value is a string, it removes quotes and
+        # replaces underscores with spaces.
             try:
                 if isinstance(eval(value), str):
                     kwargs[key] = value.strip('"').replace('_', ' ')
@@ -137,7 +143,11 @@ class HBNBCommand(cmd.Cmd):
                     kwargs[key] = eval(value)
             except Exception:
                 pass
+
+        # The code then instantiates the specified class
+        # with the processed keyword arguments
             new_instance = HBNBCommand.classes[class_name](**kwargs)
+        # Saves the instance, and prints its ID.
             storage.save()
             print(new_instance.id)
 
