@@ -10,18 +10,33 @@ class FileStorage:
 
     def all(self, cls=None):
         """ Returns a dictionary of models currently in storage"""
-        return FileStorage.__objects
+        if cls == None:
+            return FileStorage.__objects
+        return {key: value for key, value in FileStorage.__objects.items() if isinstance(value, cls)}
+
 
     def new(self, obj):
         """Adds new object to storage dictionary"""
         self.all().update({obj.to_dict()['__class__'] + '.' + obj.id: obj})
 
     def delete(self, obj=None):
-        """Deletes obj from __objects if exist inside"""
-        try:
-            del self.__objects["{type(obj).__name} . {obj.id}"]
-        except Exception:
-            pass
+        """
+        Deletes an object from __objects if it exists.
+
+        Args:
+            obj: The object to delete. If obj is None, the method does nothing.
+        """
+        if obj != None:
+            key = "{}.{}".format(type(obj).__name__, obj.id)
+            if key in self.__objects:
+                del self.__objects[key]
+
+#    def delete(self, obj=None):
+ #       """Deletes obj from __objects if exist inside"""
+  #      try:
+   #         del self.__objects["{type(obj).__name} . {obj.id}"]
+    #    except Exception:
+     #       pass
 
     def save(self):
         """Saves storage dictionary to file"""
@@ -56,8 +71,3 @@ class FileStorage:
         except FileNotFoundError:
             pass
 
-    # Add a new public instance method: def delete(self, obj=None)
-    # to delete obj from __objects if it’s inside
-    def delete(self, obj=None):
-        if obj != None and obj in self.__class__.__objects:
-            del self.__class__.__objects[obj]
