@@ -3,7 +3,7 @@
 from models.base_model import BaseModel, Base
 from sqlalchemy import Column, String, ForeignKey
 import os
-import sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship
 
 
 class State(BaseModel, Base):
@@ -15,16 +15,13 @@ class State(BaseModel, Base):
     name = Column(String(128), nullable=False)
 
     if os.environ.get('HBNB_TYPE_STORAGE') == 'db':
-        cities = relationship("cities", backref="state", cascade="all, delete")
+        cities = relationship("City", backref="state", cascade="all, delete")
     else:
         @property
         def cities(self):
-        """
-        Getter attribute for cities that returns a list of City
-        instances with state_id equal to the current State.id.
-        """
-        # Import the City model if not already imported
-        from models import Storage, City
-        # Assuming self.id is the current state's ID
-        cities = [city for city in storage.all(City).values() if city.state_id == self.id]
-        return cities
+            """Getter attribute for cities that returns a list of City"""
+            # Import the City model if not already imported
+            from models import Storage, City
+            # Assuming self.id is the current state's ID
+            cities = [city for city in storage.all(City).values() if city.state_id == self.id]
+            return cities

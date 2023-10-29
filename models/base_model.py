@@ -3,7 +3,7 @@
 import uuid
 from datetime import datetime
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, String, ForeignKey, DateTime
+from sqlalchemy import Column, String, DateTime, ForeignKey
 
 Base = declarative_base()
 
@@ -16,8 +16,8 @@ class BaseModel:
     """
 
     id = Column(String(60), primary_key=True, nullable=False)
-    created_at = Column(DateTime, nullable=False, default=datetime.utc.now)
-    updated_at = Column(DateTime, nullable=False, default=datetime.utc.now)
+    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
+    updated_at = Column(DateTime, nullable=False, default=datetime.utcnow)
 
     def __init__(self, *args, **kwargs):
         """Instatntiates a new model"""
@@ -42,7 +42,7 @@ class BaseModel:
     def save(self):
         """Updates updated_at with current time when instance is changed"""
         from models import storage
-        self.updated_at = datetime.now()i
+        self.updated_at = datetime.now()
         storage.new(self)
         storage.save()
 
@@ -55,8 +55,8 @@ class BaseModel:
         dictionary['created_at'] = self.created_at.isoformat()
         dictionary['updated_at'] = self.updated_at.isoformat()
         # Remove '_sa_instance_state' key if it exists
-        if '_sa_instance_state' in obj_dict:
-            del obj_dict['_sa_instance_state']
+        if '_sa_instance_state' in dictionary:
+            del dictionary['_sa_instance_state']
         return dictionary
 
     def delete(self):
