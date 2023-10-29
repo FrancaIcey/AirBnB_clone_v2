@@ -21,7 +21,7 @@ class State(BaseModel, Base):
         def cities(self):
             """Getter attribute for cities that returns a list of City"""
             # Import the City model if not already imported
-            from models import Storage, City
+            from models import storage, City
             # Assuming self.id is the current state's ID
             cities = [city for city in storage.all(City).values() if city.state_id == self.id]
             return cities
