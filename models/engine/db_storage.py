@@ -42,6 +42,9 @@ class DBStorage:
             results = self.__session.query(State).all()
             results.extend(self.__session.query(City).all())
             results.extend(self.__session.query(User).all())
+            results.extend(self.__session.query(Place).all())
+            results.extend(self.__session.query(Review).all())
+            results.extend(self.__session.query(Amenity).all())
         return {f"{type(obj).__name__}.{obj.id}": obj for obj in results}
 
     def new(self, obj):
@@ -61,5 +64,10 @@ class DBStorage:
         """Create all tables in the database and initialize the session"""
         Base.metadata.create_all(self.__engine)
         session_factory = sessionmaker(bind=self.__engine, expire_on_commit=False)
-        self.__session = scoped_session(session_factory)()
+        Session = scoped_session(session_factory)
+        self.__session = Session
+
+    def close(self):
+        """Close the working SQLAlchemy session."""
+        self.__session.close()
 
