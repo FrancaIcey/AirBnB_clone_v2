@@ -1,38 +1,43 @@
 #!/usr/bin/python3
-"""Defines the State class."""
-import models  # Import the 'models' module
-# Import the 'getenv' function from 'os'
-from os import getenv
+""" State Module for HBNB project """
+
+# Import necessary libraries and classes
 from models.base_model import BaseModel, Base
-from models.city import City
-from sqlalchemy import Column, String
 from sqlalchemy.orm import relationship
+from sqlalchemy import Column, String
+import os
 
 class State(BaseModel, Base):
-    """Represents a state for a MySQL database.
-
-    Inherits from SQLAlchemy Base and links to the MySQL table states.
+    """
+    State class for storing state data.
 
     Attributes:
-        __tablename__ (str): The name of the MySQL table to store States.
-        name (sqlalchemy String): The name of the State.
-        cities (sqlalchemy relationship): The State-City relationship.
+        __tablename__ (str): The name of the database table to store
+                            state data.
+        name (sqlalchemy.Column): The name of the state, stored as a string.
+        cities (relationship): One-to-Many relationship with the City class,
+                              back-referenced as "state", with cascade delete.
     """
-    # Define the MySQL table name for States
+
+    # Define the name of the database table
     __tablename__ = "states"
     name = Column(String(128), nullable=False)
-    # Define a relationship with the 'City' class, back reference, and cascade behavior
 
-    cities = relationship("City",  backref="state", cascade="delete")
-    
-    # Check the storage type
-    if getenv("HBNB_TYPE_STORAGE") != "db":
+    if os.environ.get('HBNB_TYPE_STORAGE') == 'db':
+        cities = relationship("City", backref="state", cascade="all, delete")
+    else:
         @property
         def cities(self):
-            """Get a list of all related City objects."""
-            city_list = []
-            for city in list(models.storage.all(City).values()):
+            """
+            Get a list of all cities associated with this state.
+
+            Returns:
+                A list of City objects associated with this state.
+            """
+            from models import storage, City
+
+            cities = []
+            for city in storage.all(City).values():
                 if city.state_id == self.id:
-                    city_list.append(city)
-            # Return the list of related City objects
-            return city_list  
+                    cities.append(city)
+            return cities

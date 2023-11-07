@@ -1,23 +1,25 @@
 #!/usr/bin/python3
-"""Defines the City class."""
-from models.base_model import Base
-from models.base_model import BaseModel
-from sqlalchemy import Column, String, ForeignKey
+"""City Module for HBNB project"""
+
+# Import necessary libraries and classes
+from models.base_model import BaseModel, Base
+from sqlalchemy import Column, ForeignKey, String
 from sqlalchemy.orm import relationship
 
 class City(BaseModel, Base):
-    """Represents a city for a MySQL database.
-
-    Inherits from SQLAlchemy Base and links to the MySQL table cities.
+    """
+    City class for storing city data.
 
     Attributes:
-        __tablename__ (str): The name of the MySQL table to store Cities.
-        name (sqlalchemy String): The name of the City.
-        state_id (sqlalchemy String): The state id of the City.
+        __tablename__ (str): The name of the database table to store city data.
+        state_id (sqlalchemy.Column): The ID of the state that this city
+                                      belongs to, stored as a string.
+        name (sqlalchemy.Column): The name of the city, stored as a string.
+        places (relationship): One-to-Many relationship with the Place class,
+                              back-referenced as "cities", with cascade delete.
     """
-    # Define the MySQL table name for Cities
-    __tablename__ = "cities"  
+    # Define the name of the database table
+    __tablename__ = "cities"
+    state_id = Column(String(60), ForeignKey('states.id'), nullable=False)
     name = Column(String(128), nullable=False)
-    state_id = Column(String(60), ForeignKey("states.id"), nullable=False)
-    # Define a relationship with the 'Place' class, back reference, and cascade behavior
-    places = relationship("Place", backref="cities", cascade="delete")
+    places = relationship("Place", backref="cities", cascade="all, delete")
