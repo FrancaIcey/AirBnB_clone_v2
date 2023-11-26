@@ -1,43 +1,27 @@
 #!/usr/bin/python3
-""" State Module for HBNB project """
-
-# Import necessary libraries and classes
-from models.base_model import BaseModel, Base
+"""Defines the State class."""
+import models
+from os import getenv
+from models.base_model import Base
+from models.base_model import BaseModel
+from sqlalchemy import Column
+from models.city import City
+from sqlalchemy import String
 from sqlalchemy.orm import relationship
-from sqlalchemy import Column, String
-import os
+
 
 class State(BaseModel, Base):
-    """
-    State class for storing state data.
-
-    Attributes:
-        __tablename__ (str): The name of the database table to store
-                            state data.
-        name (sqlalchemy.Column): The name of the state, stored as a string.
-        cities (relationship): One-to-Many relationship with the City class,
-                              back-referenced as "state", with cascade delete.
-    """
-
-    # Define the name of the database table
+    """Represents a State"""
     __tablename__ = "states"
     name = Column(String(128), nullable=False)
+    cities = relationship("City", backref="state", cascade="delete")
 
-    if os.environ.get('HBNB_TYPE_STORAGE') == 'db':
-        cities = relationship("City", backref="state", cascade="all, delete")
-    else:
+    if getenv("HBNB_TYPE_STORAGE") != "db":
         @property
         def cities(self):
-            """
-            Get a list of all cities associated with this state.
-
-            Returns:
-                A list of City objects associated with this state.
-            """
-            from models import storage, City
-
-            cities = []
-            for city in storage.all(City).values():
+            """Get a list of all related Cities."""
+            city_l = []
+            for city in list(models.storage.all(City).values()):
                 if city.state_id == self.id:
-                    cities.append(city)
-            return cities
+                    city_l.append(city)
+            return city_l
